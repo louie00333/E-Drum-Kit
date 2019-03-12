@@ -5,8 +5,7 @@ module PWM_Generator(
 	output logic		GPIO_2,
 	
 	input  reg [15:0]	Top,		
-	input	 logic		clk,
-	output LED
+	input	 logic		clk
 );
 
 //=======================================================
@@ -23,7 +22,8 @@ statetype state = CountUpBefore, nextState = CountUpBefore;
 //  Pre-Assignments
 //=======================================================
 
-assign LED = 1;
+//assign LED = 1;
+
 //=======================================================
 //  Output MUX
 //=======================================================

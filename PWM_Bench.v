@@ -6,7 +6,7 @@
 module PWM_Bench(
 
 	//////////// CLOCK //////////
-	//input 		          		CLOCK_50,
+	input 		          		CLOCK_50,
 
 	//////////// KEY //////////
 	input 		     [1:0]		KEY,
@@ -44,29 +44,68 @@ module PWM_Bench(
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
-parameter [15:0] Top		= 1000;
-parameter [15:0] Top2	= 100;
-parameter [15:0]  clk_prescale_48k = 1023;
-parameter [15:0]  clk_prescale_16k = 3125;
+
+parameter [15:0] clk_prescale_48k = 1023;
+parameter [15:0] clk_prescale_16k = 3125;
+parameter [15:0] clk_prescale_1k  = 50000;
+parameter [15:0] clk_prescale_1M  = 50;
 // Ensure these parameters match SDRAM Module
 parameter N=13, M=16;
 
-reg  CLOCK_50;
+//reg  CLOCK_50;
+
+// 50M/1023/NoteFrequency
+parameter [15:0] A3	= 222;
+parameter [15:0] C4	= 187;
+parameter [15:0] D4	= 166;
+parameter [15:0] E4	= 148;
+parameter [15:0] F4	= 140;
 
 wire CLOCK_48k;
 wire CLOCK_16k;
+wire CLOCK_1M;
+wire CLOCK_1k;
+
+wire Output_1, Output_2, Output_3, Output_4, Output_5, Output_MIX;
+wire [4:0]  sel;
 wire [11:0]	ADC_Val;
+wire MIX_Freq;
+
+assign sel[0] = GPIO[0];
+assign sel[1] = GPIO[1];
+assign sel[2] = GPIO[3];
+assign sel[3] = GPIO[5];
+assign sel[4] = GPIO[7];
 
 //=======================================================
 //  Structural coding
 //=======================================================
-/*
 Clock_Scaler	clk0 (clk_prescale_48k, CLOCK_50, CLOCK_48k);
-Clock_Scaler	clk1 (clk_prescale_16k, CLOCK_50, CLOCK_16k);
+Clock_Scaler	clk1 (clk_prescale_1M, CLOCK_50, CLOCK_1M);
 
-PWM_Test	u0 (GPIO_2[0], Top, CLOCK_48k, KEY[0]);
-PWM_Test	u1 (GPIO_2[1], Top2, CLOCK_48k, KEY[0]);
-*/
+PWM_Generator  u1 (Output_1, A3, CLOCK_48k);
+PWM_Generator	u2 (Output_2, C4, CLOCK_48k);
+PWM_Generator	u3 (Output_3, D4, CLOCK_48k);
+PWM_Generator	u4 (Output_4, E4, CLOCK_48k);
+PWM_Generator	u5 (Output_5, F4, CLOCK_48k);
+
+Adder	f1 (MIX_Freq, A3, C4, D4, E4, F4, sel, CLOCK_50);
+PWM_Generator	u6 (Output_MIX, MIX_Freq, CLOCK_48k);	// TODO: Change BUTTON to SW_Enable
+
+assign	GPIO[33] = (sel==5'b11111) ? 1'b0 : 1'bz,
+			GPIO[33]	= (sel==5'b11110) ? Output_1 : 1'bz,
+			GPIO[33]	= (sel==5'b11101) ? Output_2 : 1'bz,
+			GPIO[33]	= (sel==5'b11011) ? Output_3 : 1'bz,
+			GPIO[33]	= (sel==5'b10111) ? Output_4 : 1'bz,
+			GPIO[33]	= (sel==5'b01111) ? Output_5 : 1'bz;			//GPIO[33]	= (sel==5'b10) ? Output_2 : 'bz,
+
+assign	GPIO[33]	= (sel!=5'b11111 && 
+							sel!=5'b11110 &&
+							sel!=5'b11101 &&
+							sel!=5'b11011 &&
+							sel!=5'b10111 &&
+							sel!=5'b01111) ? Output_MIX : 1'bz;		
+/*
 ADC_In	ADC1(
 	LED,
 	ADC_Val,
@@ -74,10 +113,10 @@ ADC_In	ADC1(
 	ADC_SADDR,
 	ADC_SCLK,
 	
-	KEY[0],
-	CLOCK_50,
+	CLOCK_1M,
 	ADC_SDAT
-);
+);*/
+
 
 /*
 SDRAM_Read	DRAM0 (
@@ -102,14 +141,13 @@ SDRAM_Read	DRAM0 (
 //=======================================================
 //  Test Bench
 //=======================================================
-
-
+/*
 initial
 	begin
 		CLOCK_50 = 0;
 	end
 
-always #10 CLOCK_50 = ~CLOCK_50;
-
+always #5 CLOCK_50 = ~CLOCK_50;
+*/
 
 endmodule
