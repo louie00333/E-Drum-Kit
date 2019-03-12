@@ -82,7 +82,7 @@ assign sel[4] = GPIO[7];
 //=======================================================
 Clock_Scaler	clk0 (clk_prescale_48k, CLOCK_50, CLOCK_48k);
 Clock_Scaler	clk1 (clk_prescale_1M, CLOCK_50, CLOCK_1M);
-
+/*
 PWM_Generator  u1 (Output_1, A3, CLOCK_48k);
 PWM_Generator	u2 (Output_2, C4, CLOCK_48k);
 PWM_Generator	u3 (Output_3, D4, CLOCK_48k);
@@ -105,7 +105,7 @@ assign	GPIO[33]	= (sel!=5'b11111 &&
 							sel!=5'b11011 &&
 							sel!=5'b10111 &&
 							sel!=5'b01111) ? Output_MIX : 1'bz;		
-/*
+*/
 ADC_In	ADC1(
 	LED,
 	ADC_Val,
@@ -113,9 +113,9 @@ ADC_In	ADC1(
 	ADC_SADDR,
 	ADC_SCLK,
 	
-	CLOCK_1M,
+	CLOCK_48k,
 	ADC_SDAT
-);*/
+);
 
 
 /*

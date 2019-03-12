@@ -2,14 +2,15 @@
 //  PWM Generation
 //=======================================================
 module ADC_In(	
-	output logic [11:0] ADC_Val = 0,
 	output logic [7:0]  LED,
+	output logic [11:0] ADC_Val,
 	output logic	CS_N = 0,
 	output logic	ADC_SADDR,
 	output logic	ADC_SCLK,
 
 	input logic 	clk,
 	input logic		ADC_SDAT
+	
 );
 
 //=======================================================
@@ -21,7 +22,7 @@ statetype state = NOP, nextState = NOP;
 //=======================================================
 //  Pre-Assignments
 //=======================================================
-reg [2:0] ADC_Address 	 = 'b101;
+reg [2:0] ADC_Address 	 = 'b000;
 reg [5:0] Counter			 = 16;
 reg [11:0] ADC_Val_Temp  = 0;
 reg Counter_Flag = 0;
@@ -48,7 +49,7 @@ end
 
 always_ff @(negedge Counter_Flag)
 begin
-	//ADC_Val <= ADC_Val_Temp;
+	ADC_Val <= ADC_Val_Temp;
 	LED[7:0] <= ADC_Val_Temp[11:4];
 end
 //=======================================================
@@ -56,7 +57,7 @@ end
 //=======================================================
 always_comb
 begin
-	ADC_SCLK <= clk;
+	ADC_SCLK = clk;
 end
 
 always_comb
