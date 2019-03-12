@@ -113,8 +113,9 @@ ADC_In	ADC1(
 	ADC_SADDR,
 	ADC_SCLK,
 	
-	CLOCK_48k,
-	ADC_SDAT
+	CLOCK_1M,
+	ADC_SDAT,
+	KEY[0]
 );
 
 
